@@ -41,6 +41,7 @@ executable multicast-client
   build-depends:       base
                      , multicast
                      , network
+                     , ncurses
 
 test-suite spec
   default-language:    Haskell2010

@@ -1,11 +1,13 @@
+{-# LANGUAGE BangPatterns #-}
+{-# LANGUAGE RankNTypes #-}
+
 module Multicast where
 
 import System.IO
+import Data.Monoid
 import Control.Monad
-import Data.Function
 import Control.Exception
 import Control.Concurrent
-import Control.Concurrent.Chan
 import Network.Socket
 
 server :: IO ()
@@ -20,39 +22,39 @@ server = do
             close
             (\sock -> do
         chan <- newChan
-        forkIO $ fix $ \loop -> do
+        _ <- forkIO $ forever $ do
             (_, msg) <- readChan chan
-            loop
+            putStrLn ("[Server]: " <> msg)
 
         mainLoop sock chan 0
             )
 
-mainLoop sock chan msgNum = do
+mainLoop :: Socket -> Chan (Int, String) -> Int -> IO ()
+mainLoop sock chan !msgNum = do
     conn <- accept sock
     _ <- forkIO $ runConn conn chan msgNum
     mainLoop sock chan $! msgNum + 1
 
-runConn (sock, _) chan msgNum = do
+runConn :: (Socket, a) -> Chan (Int, String) -> Int -> IO ()
+runConn (sock, _) chan !msgNum = do
     hdl <- socketToHandle sock ReadWriteMode
     hSetBuffering hdl NoBuffering
 
     hPutStrLn hdl "Hi, what's your name?"
     name <- hGetLine hdl
-    let broadcast msg = writeChan chan (msgNum, name ++ ": " ++ msg)
-    broadcast $ "--> " ++ name ++ " entered chat."
-    hPutStrLn hdl $ "Welcome, " ++ name ++ "!"
+    let broadcast msg = writeChan chan (msgNum, name <> ": " <> msg)
+    broadcast $ "<-- entered chat."
+    hPutStrLn hdl $ "Welcome, " <> name <> "!"
 
     commLine <- dupChan chan
 
-    bracket (forkIO $ fix $ \go -> do
-        (nextNum, line) <- readChan commLine
-        when (msgNum /= nextNum) $ hPutStrLn hdl line
-        go)
-        (\thread -> do
-            killThread thread
-            hClose hdl
-            broadcast $ "<-- " ++ name ++ " left.")
-        (\_ -> fix $ \go -> do
-            line <- hGetLine hdl
-            broadcast line
-            go)
+    bracket (forkIO $ forever $ do
+                (nextNum, line) <- readChan commLine
+                when (msgNum /= nextNum) $ hPutStrLn hdl line
+            )
+            (\thread -> do
+                killThread thread
+                hClose hdl
+                broadcast $ "<-- " <> name <> " left."
+            )
+            (const . forever $ hGetLine hdl >>= broadcast)
