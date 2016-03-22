@@ -6,8 +6,12 @@ import Control.Concurrent
 import System.IO
 import Multicast.Command
 
+import qualified Client.UI as UI
+
 main :: IO ()
 main = do
+    UI.main
+    {-
     putStrLn "~~ Multicast Client ~~"
     putStrLn "Connecting to server..."
 
@@ -34,6 +38,7 @@ main = do
         p <- hGetLine h
         putStrLn p
 
+-}
 
 prompt :: String -> IO String
 prompt s = do
