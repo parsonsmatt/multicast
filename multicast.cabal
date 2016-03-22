@@ -35,6 +35,8 @@ executable multicast-server
 
 executable multicast-client
   default-language:    Haskell2010
+  other-modules:       Main
+                     , Client.UI
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
   hs-source-dirs:      client
   main-is:             Main.hs
