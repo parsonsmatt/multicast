@@ -1,12 +1,12 @@
 {-# LANGUAGE DeriveGeneric #-}
 
-module Multicast.Command 
+module Multicast.Command
     ( module S
     , module Multicast.Command
     ) where
 
-import Data.Serialize as S
-import GHC.Generics
+import           Data.Serialize as S
+import           GHC.Generics
 
 type ClientId = Int
 type MessagePort = Int
@@ -19,9 +19,9 @@ data Command
     | Send String
     deriving  (Eq, Show, Read, Generic)
 
-data Message 
+data Message
     = Message
-    { command :: Command
+    { command     :: Command
     , respondPort :: ClientId
     } deriving (Eq, Show, Generic)
 

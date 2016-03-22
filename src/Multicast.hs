@@ -1,14 +1,14 @@
 {-# LANGUAGE BangPatterns #-}
-{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE RankNTypes   #-}
 
 module Multicast where
 
-import System.IO
-import Data.Monoid
-import Control.Monad
-import Control.Exception
-import Control.Concurrent
-import Network.Socket
+import           Control.Concurrent
+import           Control.Exception
+import           Control.Monad
+import           Data.Monoid
+import           Network.Socket
+import           System.IO
 
 server :: IO ()
 server = do

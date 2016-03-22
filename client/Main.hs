@@ -1,12 +1,12 @@
 module Main where
 
-import Network.Socket
-import Control.Monad
-import Control.Concurrent
-import System.IO
-import Multicast.Command
+import           Control.Concurrent
+import           Control.Monad
+import           Multicast.Command
+import           Network.Socket
+import           System.IO
 
-import qualified Client.UI as UI
+import qualified Client.UI          as UI
 
 main :: IO ()
 main = do
